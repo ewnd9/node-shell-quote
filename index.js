@@ -20,6 +20,28 @@ exports.quote = function (xs) {
     }).join(' ');
 };
 
+exports.unparse = function (xs) {
+    return map(xs, function (s) {
+        if (s && typeof s === 'object') {
+            if (s.hasOwnProperty('pattern')) {
+                return '"' + s.pattern + '"';
+            } else {
+                return s.op;
+            }
+        }
+        else if (/["\s]/.test(s) && !/'/.test(s)) {
+            return "'" + s.replace(/(['\\])/g, '\\$1') + "'";
+        }
+        else if (/["'\s]/.test(s)) {
+            return '"' + s.replace(/(["\\$`!])/g, '\\$1') + '"';
+        }
+        else {
+            return String(s).replace(/([\\$`()!#&*|])/g, '\\$1');
+        }
+    }).join(' ');
+};
+
+
 var CONTROL = '(?:' + [
     '\\|\\|', '\\&\\&', ';;', '\\|\\&', '[&;()|<>]'
 ].join('|') + ')';
